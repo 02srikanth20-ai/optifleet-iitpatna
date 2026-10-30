@@ -638,13 +638,13 @@
       });
     }
 
-    // --- 5. INTERACTIVE OPTIMIZATION STEP & LOGS ---
+    // --- 5. INTERACTIVE OPTIMIZATION STEP & BACKEND CONNECTION ---
     async function runOptimizationStep() {
       const surgeMultiplier = parseFloat(document.getElementById('sliderSurge').value);
       const maxDetour = parseFloat(document.getElementById('sliderDetour').value);
 
       try {
-        // Attempt call to Python FastAPI backend (app.py)
+        // Connects frontend directly to your Python FastAPI backend (app.py)
         const response = await fetch('http://localhost:8000/api/optimize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -659,10 +659,10 @@
         const resData = await response.json();
         if (resData.status === "success") {
           document.getElementById('kpiWait').innerText = `${resData.average_wait_time_min} min`;
-          addLogEntry(`FastAPI Engine solved matching: <b>${resData.active_matches_count}</b> pairs. Optimal Surge: <b>${resData.pricing_info.surge_multiplier}x</b>`, 'match');
+          addLogEntry(`Backend Engine matched <b>${resData.active_matches_count}</b> pairs. Optimal Surge: <b>${resData.pricing_info.surge_multiplier}x</b>`, 'match');
         }
       } catch (err) {
-        // Client-side fallback simulation when backend is offline
+        // Graceful fallback simulation if backend server is offline
         zones.forEach(z => {
           z.rides += Math.floor(Math.random() * 4) + 1;
           z.revenue += Math.floor(180 * surgeMultiplier * (Math.random() * 2 + 1));
